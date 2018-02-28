@@ -195,11 +195,17 @@ function Draw_Monthly_Graph(principal, iRate, months, offset, scale, graph_heigh
 		let monthly_interest = remaining_principal*iRate;
 		let principal_paid = monthly_payment-monthly_interest;
 		remaining_principal = remaining_principal-principal_paid;
+
+		let percent_interest = monthly_interest/(monthly_payment);
+
 		strokeWeight(res/2);
 
 		xCurrent = res*i+offset;
 		yMin = height-res;
 
+		map(monthly_payment, 0, monthly_payment, 0, height);
+		map(monthly_interest, 0, monthly_interest, 0, height);
+		map(initial_interest, 0, initial_interest, 0, height);
 
 		yMax = (height-monthly_payment/scale);
 		yPoint = height-(monthly_payment/scale)+(monthly_interest/scale);
@@ -208,30 +214,27 @@ function Draw_Monthly_Graph(principal, iRate, months, offset, scale, graph_heigh
 		yMaxShift = map(yMax, yMin, yMax, yMin, graph_height);
 		yPointShift = map(yPoint, yPointMin, yMax, yPointMin, graph_height);
 
-		push();
-			stroke(204,0,0);
-			line(xCurrent, yMin, xCurrent, yMaxShift);
-		pop();
-
-		push();
-			stroke(0,204,0);
-			line(xCurrent, yPointShift, xCurrent, yMaxShift);
-		pop();
-
-		push();
-			stroke(255);
-			point(xCurrent, yPointShift);
-		pop();
+		draw_line(xCurrent, yMin, xCurrent, yMaxShift, 204, 0, 0);
+		draw_line(xCurrent, yPointShift, xCurrent, yMaxShift, 0, 204, 0);
+		draw_point(xCurrent, yPointShift, 255, 255, 255);
 	}
 
-	push();
-		stroke(204,0,0);
-		line(res*months+offset, yMin, res*(months)+offset, yMaxShift);
-	pop();
+	xFinal = res*months+offset;
+	draw_line(xFinal, yMin, xFinal, yMaxShift, 204, 0, 0);
+	draw_point(xFinal, yMaxShift, 255, 255, 255);
 
-	push();
-		stroke(255);
-		point(res*months+offset, yMaxShift);
-	pop();
+}
 
+function draw_line(xi, yi, xf, yf, r, g, b){
+	push();
+		stroke(r, g, b);
+		line(xi, yi, xf, yf);
+	pop();
+}
+
+function draw_point(x, y, r, g, b){
+	push();
+		stroke(r, g, b);
+		point(x, y);
+	pop();
 }
