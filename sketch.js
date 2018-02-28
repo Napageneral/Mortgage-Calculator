@@ -38,18 +38,22 @@ function draw() {
 
 	Draw_Monthly_Graph(principal, iRate, months, 50, 500);
 	Slider_Setup(principal, iRate, months, 50, 50, 20);
-	pieChart(300, pvi_perc , 900, 175);
+	pieChart_info(total_paid, 300, pvi_perc , 900, 175);
 
-	Print_Monthly_Payment(monthly_payment, 10, 435, 20);
-	Print_Total_Paid(total_paid, 800, 182, 20);
+}
 
+function pieChart_info(total_paid, diameter, data, x, y){
+	pieChart(diameter, data, x, y);
+	Print_Total_Paid(total_paid, x-100, y+6.6, 20);
 }
 
 function pieChart(diameter, data, x, y) {
 	push();
+
+	translate(x,y);
 	stroke(0);
 	strokeWeight(2);
-	translate(x,y);
+
   var lastAngle = 0;
   for (var i = 0; i < data.length; i++) {
 		fill(204*abs(i-1), 204*i, 0);
@@ -217,7 +221,15 @@ function Draw_Monthly_Graph(principal, iRate, months, offset, graph_height){
 	strokeWeight(res);
 	draw_line(width-offset+res, yMin+res, width-offset+res, yMax-res, 0, 0, 0);
 	draw_line(offset, yMin+res, offset, yMax-res, 0, 0, 0);
+	draw_line(offset-res, yMax, width-offset+res*2, yMax, 0, 0, 0);
 	draw_line(offset-res, yMin, width-offset+res*2, yMin, 0, 0, 0);
+
+	push();
+		translate(27.5,graph_height*1.75);
+		rotate(-PI/2);
+		Print_Monthly_Payment(monthly_payment, 0, 0, 20);
+	pop();
+
 
 }
 
