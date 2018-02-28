@@ -8,7 +8,7 @@ function setup() {
 	createCanvas(1200,1000);
 
 	principal_slider = createSlider(100000,800000,200000,1000);
-	annual_rate_slider = createSlider(1,9,4,0.1);
+	annual_rate_slider = createSlider(1,12,4,0.1);
 	years_slider = createSlider(5,50,30,1);
 
 	principal_input = createInput();
@@ -36,10 +36,12 @@ function draw() {
 
 	let pvi_perc = [(principal/total_paid)*360, ((total_paid-principal)/total_paid)*360];
 
-	Draw_Monthly_Graph(principal, iRate, months, 50, 5);
+	Draw_Monthly_Graph(principal, iRate, months, 50, 10, 500);
 	Slider_Setup(principal, iRate, months, 50, 50, 20);
-	Print_Stats(principal, iRate, months, 50, 1100, 20);
-	pieChart(300, pvi_perc , 900, 200);
+	pieChart(300, pvi_perc , 900, 175);
+
+	Print_Monthly_Payment(monthly_payment, 50, 200, 20);
+	Print_Total_Paid(total_paid, 800, 182, 20);
 
 }
 
@@ -51,7 +53,7 @@ function pieChart(diameter, data, x, y) {
   var lastAngle = 0;
   for (var i = 0; i < data.length; i++) {
 		fill(204*abs(i-1), 204*i, 0);
-    arc(0, 0, diameter, diameter, lastAngle, lastAngle+radians(data[i]));
+    arc(0, 0, diameter, diameter, lastAngle, lastAngle+radians(data[i]), PIE);
     lastAngle += radians(data[i]);
   }
 	pop();
@@ -79,6 +81,26 @@ function Slider_Setup(principal, iRate, months, x, y, size){
 	Principal_Slider_Setup(principal, x+xOffset, y+yOffset, size);
 	Interest_Rates_Slider_Setup(iRate , x+xOffset, y+size*1.25+yOffset, size);
 	Time_Slider_Setup(months, x+xOffset, y+size*3.5+yOffset, size);
+}
+
+function Print_Total_Paid(total_amount, x, y, size){
+	total_paid = Number.parseFloat(total_amount).toFixed(2);
+	push();
+	fill(255);
+	stroke(0);
+	strokeWeight(5);
+	Print_Arbitrary("Total Paid:", total_paid, x, y, size, 5.5);
+	pop();
+}
+
+function Print_Monthly_Payment(monthly_amount, x, y, size){
+	monthly_payment = Number.parseFloat(monthly_amount).toFixed(2);
+	push();
+		strokeWeight(1);
+		textSize(size);
+		text("Monthly Payment:", x, y);
+		text(monthly_payment, x+size*9, y);
+	pop();
 }
 
 
@@ -161,11 +183,13 @@ function Monthly_Payment(principal, iRate, months){
 	return (principal*iRate*pow(1+iRate, months))/((pow(1+iRate, months) - 1));
 }
 
-function Draw_Monthly_Graph(principal, iRate, months, offset, scale){
+function Draw_Monthly_Graph(principal, iRate, months, offset, scale, graph_height){
 	let monthly_interest;
 	let res = (width-offset*2)/months;
 	let remaining_principal = principal;
 	let monthly_payment = Monthly_Payment(principal, iRate, months)
+	let initial_interest = principal*iRate;
+	graph_height = height - graph_height;
 
 	for (var i = 1; i <= months; i++) {
 		let monthly_interest = remaining_principal*iRate;
@@ -173,30 +197,41 @@ function Draw_Monthly_Graph(principal, iRate, months, offset, scale){
 		remaining_principal = remaining_principal-principal_paid;
 		strokeWeight(res/2);
 
+		xCurrent = res*i+offset;
+		yMin = height-res;
+
+
+		yMax = (height-monthly_payment/scale);
+		yPoint = height-(monthly_payment/scale)+(monthly_interest/scale);
+		yPointMin = height-(monthly_payment/scale)+(initial_interest/scale);
+
+		yMaxShift = map(yMax, yMin, yMax, yMin, graph_height);
+		yPointShift = map(yPoint, yPointMin, yMax, yPointMin, graph_height);
+
 		push();
 			stroke(204,0,0);
-			line(res*i+offset,height-res, res*i+offset, (height-monthly_payment/scale));
+			line(xCurrent, yMin, xCurrent, yMaxShift);
 		pop();
 
 		push();
 			stroke(0,204,0);
-			line(res*i+offset,(height-monthly_payment/scale)+monthly_interest/scale, res*i+offset, (height-monthly_payment/scale));
+			line(xCurrent, yPointShift, xCurrent, yMaxShift);
 		pop();
 
 		push();
 			stroke(255);
-			point(res*i+offset, (height-monthly_payment/scale)+monthly_interest/scale);
+			point(xCurrent, yPointShift);
 		pop();
 	}
 
 	push();
 		stroke(204,0,0);
-		line(res*months+offset, height-res, res*(months)+offset, (height-monthly_payment/scale));
+		line(res*months+offset, yMin, res*(months)+offset, yMaxShift);
 	pop();
 
 	push();
 		stroke(255);
-		point(res*months+offset, height-monthly_payment/scale);
+		point(res*months+offset, yMaxShift);
 	pop();
 
 }
