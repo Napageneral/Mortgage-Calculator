@@ -39,8 +39,16 @@ function draw() {
 	Draw_Monthly_Graph(principal, iRate, months, 50, 500);
 	Slider_Setup(principal, iRate, months, 50, 50, 20);
 	pieChart_info(total_paid, 300, pvi_perc , 900, 175);
+	Print_Monthly_Payment(monthly_payment,200,200,20);
 
 }
+
+
+
+
+
+
+
 
 function pieChart_info(total_paid, diameter, data, x, y){
 	pieChart(diameter, data, x, y);
@@ -144,8 +152,8 @@ function Interest_Rates_Slider_Setup(iRate, x, y, size){
 
 function Print_Interest_Rates(iRate, x, y, size){
 	push();
-		annual = Number.parseFloat(iRate*1000).toFixed(4);
-		monthly = Number.parseFloat(iRate*1000/12).toFixed(4);
+		annual = Number.parseFloat(iRate*1200).toFixed(4);
+		monthly = Number.parseFloat(iRate*100).toFixed(4);
 		strokeWeight(1);
 		textSize(size);
 		text("Annual Interest Rate:", x, y);
@@ -219,17 +227,35 @@ function Draw_Monthly_Graph(principal, iRate, months, offset, graph_height){
 	draw_point(xFinal, yMax, 255, 255, 255);
 
 	strokeWeight(res);
+	//Borders
 	draw_line(width-offset+res, yMin+res, width-offset+res, yMax-res, 0, 0, 0);
 	draw_line(offset, yMin+res, offset, yMax-res, 0, 0, 0);
-	draw_line(offset-res, yMax, width-offset+res*2, yMax, 0, 0, 0);
+	draw_line(offset-res, yMax-res, width-offset+res*2, yMax-res, 0, 0, 0);
 	draw_line(offset-res, yMin, width-offset+res*2, yMin, 0, 0, 0);
 
+	//x axis Tick marks
+	for (var i = 1; i < 10; i++) {
+		draw_line(offset-res*1.5, yMin-i/10*graph_height, offset, yMin-i/10*graph_height, 0, 0, 0);
+	}
+
+	//y axis Tick marks
+	for (var i = 1; i < 10; i++) {
+		draw_line(offset+((i/10)*(width-offset*2)), yMax-res, offset+((i/10)*(width-offset*2)), yMax-res*2.5, 0, 0, 0);
+		unit = "Months";
+		cWidth = textWidth(unit);
+		value = Number.parseFloat((i/10)*months/12).toFixed(2);
+		Print_Arbitrary(value, "Months", offset+((i/10)*(width-offset*2))-cWidth/2, yMax-res*4, 20);
+	}
+
+	//Label Y axis
 	push();
 		translate(27.5,graph_height*1.75);
 		rotate(-PI/2);
-		Print_Monthly_Payment(monthly_payment, 0, 0, 20);
+		Print_Arbitrary("Monthly Payment", "", 0, 0, 30);
 	pop();
 
+	//Label X axis
+	Print_Arbitrary("Years", "", (width)/2-40, yMax-res*10, 30);
 
 }
 
